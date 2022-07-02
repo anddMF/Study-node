@@ -1,0 +1,17 @@
+POST http://localhost:4002/products
+content-type: application/json
+
+{
+    "name": "Caneta",
+    "price": 12
+}
+
+### 
+
+GET http://localhost:4002/products
+content-type: application/json
+
+###
+
+GET http://localhost:4002/products/02a0828d-48a0-4b39-87f7-36f77cb03f34
+content-type: application/json
