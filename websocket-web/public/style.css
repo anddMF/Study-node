@@ -24,6 +24,15 @@ html, body {
     padding: 0 2vw;
     font-size: 1.5vw;
   }
+
+  input:disabled {
+    background-color: #c1c1c1;
+    color: white;
+  }
+
+  button:disabled {
+    background-color: #c1c1c1;
+  }
   
   button {
     width: 60vw;

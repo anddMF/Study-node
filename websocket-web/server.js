@@ -43,6 +43,10 @@ io.on('connection', socket => {
         console.log(`User desconectado: ${socket.id}`);
     });
 
+    socket.on('user connected', (obj) => {
+        socket.broadcast.emit('receivedMessage',{user: 'CHAT', message: `Usuario conectado: ${obj.name}`});
+    })
+
     // front ta enviando o evento de nome 'chat message'
     socket.on('chat message', (msg) => {
         messages.push(msg);
