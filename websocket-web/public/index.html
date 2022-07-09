@@ -15,18 +15,41 @@
 
 <body>
     <form id="chat">
-        <input type="text" name="username" id="username" placeholder="Digite seu usuário">
+        <input type="text" name="username" placeholder="Digite seu usuário">
+        <button id="btnName">Salvar nome</button>
         <div class="messages"></div>
-        <input type="text" name="message" placeholder="Digite sua mensagem">
-        <button type="submit">Enviar</button>
+        <input type="text" name="message" disabled placeholder="Digite sua mensagem">
+        <button type="submit" name="send" disabled>Enviar</button>
+    </form>
+    <hr>
+    <form id="private">
+        <input type="text" name="userid" placeholder="Digite id do usuario">
+        <input type="text" name="pvtMessage" placeholder="Mensagem">
+        <button type="submit">Enviar mensagem privada</button>
     </form>
 
     <script type="text/javascript">
         var socket = io('http://localhost:3000');
+        var username = '';
 
         function renderMessage(message) {
             $('.messages').append('<div class="message"><strong>' + message.user + ':</strong> ' + message.message + '</div>');
         }
+
+        $('#btnName').click(function () {
+            console.log('CLICOU')
+            username = $('input[name=username]').val();
+
+            if (username.length) {
+                console.log('NOME: ' + username);
+                socket.auth = { username };
+                socket.connect();
+                socket.emit('user connected', { name: username });
+                $('input[name=message]').prop("disabled", false);
+                $('button[name=send]').prop("disabled", false);
+            }
+
+        });
 
         socket.on('previousMessages', function (messages) {
             for (message of messages) {
@@ -34,8 +57,27 @@
             }
         })
 
+        socket.on('users', (users) => {
+            users.forEach(element => {
+                console.log('loop users', element)
+            });
+        })
+
+        // socket.emit("private message", {
+        //     content,
+        //     to: this.selectedUser.userID,
+        // });
+        // this.selectedUser.messages.push({
+        //     content,
+        //     fromSelf: true,
+        // });
+
         socket.on('receivedMessage', obj => {
             renderMessage(obj);
+        });
+
+        socket.on('private message', obj => {
+            console.log(obj);
         })
 
         $('#chat').submit(function (event) {
@@ -52,6 +94,27 @@
 
                 renderMessage(obj);
                 socket.emit('chat message', obj);
+            };
+        })
+
+        $('#private').submit(function (event) {
+            event.preventDefault();
+
+            var user = $('input[name=userid]').val();
+            var message = $('input[name=pvtMessage]').val();
+
+            if (user.length && message.length) {
+                var obj = {
+                    user: user,
+                    message: message
+                }
+
+                //renderMessage(obj);
+
+                socket.emit('private message', {
+                    to: user,
+                    content: message
+                })
             };
         })
     </script>
